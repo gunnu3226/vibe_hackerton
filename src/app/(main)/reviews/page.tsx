@@ -6,8 +6,8 @@ import ReviewsFeed from "@/components/reviews/ReviewsFeed";
 import SubmitReviewForm from "@/components/reviews/SubmitReviewForm";
 
 export default function ReviewsPage() {
-  const { profile } = useUser();
-  const { reviews, loading, submitReview } = useRealtimeReviews();
+  const { profile, user } = useUser();
+  const { reviews, loading, submitReview, updateReview } = useRealtimeReviews();
 
   if (loading) {
     return (
@@ -48,7 +48,11 @@ export default function ReviewsPage() {
           </div>
         )}
 
-        <ReviewsFeed reviews={reviews} />
+        <ReviewsFeed
+          reviews={reviews}
+          currentUserId={user?.id}
+          onUpdate={updateReview}
+        />
       </div>
     </div>
   );

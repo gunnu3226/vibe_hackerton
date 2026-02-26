@@ -73,5 +73,38 @@ export function useRealtimeReviews() {
     [supabase],
   );
 
-  return { reviews, loading, submitReview };
+  const updateReview = useCallback(
+    async ({
+      id,
+      projectIntro,
+      aiToolsUsed,
+      aiStrengths,
+      aiWeaknesses,
+      insights,
+      deployUrl,
+    }: {
+      id: string;
+      projectIntro: string;
+      aiToolsUsed: string;
+      aiStrengths: string;
+      aiWeaknesses: string;
+      insights: string;
+      deployUrl?: string;
+    }) => {
+      await supabase
+        .from("reviews")
+        .update({
+          project_intro: projectIntro,
+          ai_tools_used: aiToolsUsed,
+          ai_strengths: aiStrengths,
+          ai_weaknesses: aiWeaknesses,
+          insights,
+          deploy_url: deployUrl || null,
+        })
+        .eq("id", id);
+    },
+    [supabase],
+  );
+
+  return { reviews, loading, submitReview, updateReview };
 }

@@ -156,6 +156,11 @@ CREATE POLICY "Team members can submit reviews"
     AND team_id IN (SELECT team_id FROM public.profiles WHERE id = auth.uid())
   );
 
+CREATE POLICY "Authors can update own reviews"
+  ON public.reviews FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = submitted_by);
+
 -- 10. channel_read_cursors 테이블 (읽음 커서)
 CREATE TABLE public.channel_read_cursors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

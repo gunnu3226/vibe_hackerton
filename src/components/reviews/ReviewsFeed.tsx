@@ -3,7 +3,23 @@
 import type { Review } from "@/lib/types/database";
 import ReviewCard from "./ReviewCard";
 
-export default function ReviewsFeed({ reviews }: { reviews: Review[] }) {
+export default function ReviewsFeed({
+  reviews,
+  currentUserId,
+  onUpdate,
+}: {
+  reviews: Review[];
+  currentUserId?: string;
+  onUpdate: (data: {
+    id: string;
+    projectIntro: string;
+    aiToolsUsed: string;
+    aiStrengths: string;
+    aiWeaknesses: string;
+    insights: string;
+    deployUrl?: string;
+  }) => Promise<void>;
+}) {
   if (reviews.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 py-12">
@@ -21,6 +37,8 @@ export default function ReviewsFeed({ reviews }: { reviews: Review[] }) {
         <ReviewCard
           key={review.id}
           review={review}
+          isOwner={currentUserId === review.submitted_by}
+          onUpdate={onUpdate}
         />
       ))}
     </div>
