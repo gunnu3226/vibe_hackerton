@@ -88,17 +88,37 @@ export function useRealtimeMessages({
   }, [supabase, channelType, teamId, fetchMessages]);
 
   const sendMessage = useCallback(
-    async (content: string) => {
+    async (content: string, imageFile?: File) => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
+
+      let imageUrl: string | null = null;
+
+      if (imageFile) {
+        const fileExt = imageFile.name.split(".").pop();
+        const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("chat-images")
+          .upload(filePath, imageFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from("chat-images")
+          .getPublicUrl(filePath);
+
+        imageUrl = urlData.publicUrl;
+      }
 
       await supabase.from("messages").insert({
         content,
         user_id: user.id,
         channel_type: channelType,
         team_id: channelType === "team" ? teamId ?? null : null,
+        image_url: imageUrl,
       });
     },
     [supabase, channelType, teamId],

@@ -47,9 +47,25 @@ export default function MessageItem({
               : "bg-white text-gray-900 shadow-sm"
           }`}
         >
-          <p className="whitespace-pre-wrap break-words text-sm">
-            {message.content}
-          </p>
+          {message.image_url && (
+            <a
+              href={message.image_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src={message.image_url}
+                alt="첨부 이미지"
+                className={`max-w-full rounded-lg ${message.content ? "mb-2" : ""}`}
+                style={{ maxHeight: "300px" }}
+              />
+            </a>
+          )}
+          {message.content && (
+            <p className="whitespace-pre-wrap break-words text-sm">
+              {message.content}
+            </p>
+          )}
         </div>
         <p
           className={`mt-1 text-xs text-gray-400 ${isOwn ? "text-right" : ""}`}

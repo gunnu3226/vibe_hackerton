@@ -34,6 +34,7 @@ CREATE TABLE public.messages (
   user_id UUID NOT NULL REFERENCES public.profiles(id),
   channel_type public.channel_type NOT NULL DEFAULT 'global',
   team_id UUID REFERENCES public.teams ON DELETE CASCADE,
+  image_url TEXT,
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 

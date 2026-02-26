@@ -22,6 +22,7 @@ export interface Message {
   user_id: string;
   channel_type: ChannelType;
   team_id: string | null;
+  image_url: string | null;
   created_at: string;
   profiles?: Profile;
 }
@@ -56,6 +57,7 @@ export interface MessageInsert {
   user_id: string;
   channel_type: ChannelType;
   team_id?: string | null;
+  image_url?: string | null;
 }
 
 export interface ResultInsert {
