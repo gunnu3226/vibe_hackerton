@@ -62,14 +62,13 @@ export function useUser() {
   );
 
   useEffect(() => {
-    const getUser = async () => {
+    const init = async () => {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        setUser(user);
-        if (user) {
-          await fetchProfile(user);
+        const { data: { session } } = await supabase.auth.getSession();
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        if (currentUser) {
+          await fetchProfile(currentUser);
         }
       } catch {
         setUser(null);
@@ -79,14 +78,15 @@ export function useUser() {
       }
     };
 
-    getUser();
+    init();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchProfile(session.user);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        await fetchProfile(currentUser);
       } else {
         setProfile(null);
       }
