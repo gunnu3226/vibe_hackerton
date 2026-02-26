@@ -7,14 +7,18 @@ import type { Message, ChannelType } from "@/lib/types/database";
 export function useRealtimeMessages({
   channelType,
   teamId,
+  onNewMessage,
 }: {
   channelType: ChannelType;
   teamId?: string | null;
+  onNewMessage?: (message: Message) => void;
 }) {
   const supabase = useSupabase();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const onNewMessageRef = useRef(onNewMessage);
+  onNewMessageRef.current = onNewMessage;
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -72,6 +76,7 @@ export function useRealtimeMessages({
                 if (prev.some((m) => m.id === msg.id)) return prev;
                 return [...prev, msg];
               });
+              onNewMessageRef.current?.(msg);
             }
           } catch {
             // ignore realtime fetch errors

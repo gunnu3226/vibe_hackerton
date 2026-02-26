@@ -27,12 +27,24 @@ export default function ReviewsPage() {
           </p>
         </div>
 
-        {profile?.team_id && (
+        {profile?.team_id ? (
           <div className="mb-6">
             <SubmitReviewForm
               teamId={profile.team_id}
               onSubmit={submitReview}
             />
+          </div>
+        ) : (
+          <div className="mb-6 flex items-center justify-between rounded-2xl border border-amber-200 bg-amber-50 px-6 py-4">
+            <p className="text-sm font-medium text-amber-800">
+              후기를 작성하려면 팀에 먼저 참여해주세요
+            </p>
+            <a
+              href="/teams"
+              className="rounded-xl bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+            >
+              팀 결성하기
+            </a>
           </div>
         )}
 

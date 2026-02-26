@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
 import { useReadCursors } from "@/hooks/useReadCursors";
 import { useUser } from "@/hooks/useUser";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import MembersModal from "./MembersModal";
-import type { ChannelType } from "@/lib/types/database";
+import type { ChannelType, Message } from "@/lib/types/database";
 
 export default function ChatRoom({
   channelType,
@@ -19,11 +19,38 @@ export default function ChatRoom({
   title: string;
 }) {
   const [showMembers, setShowMembers] = useState(false);
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (typeof Notification !== "undefined" && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const handleNewMessage = useCallback(
+    (msg: Message) => {
+      if (
+        typeof Notification === "undefined" ||
+        Notification.permission !== "granted" ||
+        !document.hidden ||
+        msg.user_id === user?.id
+      ) {
+        return;
+      }
+
+      const sender = msg.profiles?.display_name ?? "알 수 없음";
+      const body = msg.image_url ? `${sender}: [사진]` : `${sender}: ${msg.content}`;
+
+      new Notification(title, { body, icon: "/favicon.ico" });
+    },
+    [user?.id, title],
+  );
+
   const { messages, loading, sendMessage } = useRealtimeMessages({
     channelType,
     teamId,
+    onNewMessage: handleNewMessage,
   });
-  const { user } = useUser();
   const { getUnreadCount, updateCursor } = useReadCursors({
     channelType,
     teamId,
