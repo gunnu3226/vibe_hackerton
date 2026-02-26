@@ -68,6 +68,19 @@ export interface ResultInsert {
   submitted_by: string;
 }
 
+export interface ChannelReadCursor {
+  id: string;
+  user_id: string;
+  channel_id: string;
+  last_read_at: string;
+}
+
+export interface ChannelReadCursorUpsert {
+  user_id: string;
+  channel_id: string;
+  last_read_at?: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -90,6 +103,11 @@ export interface Database {
         Row: Result;
         Insert: ResultInsert;
         Update: Partial<ResultInsert>;
+      };
+      channel_read_cursors: {
+        Row: ChannelReadCursor;
+        Insert: ChannelReadCursorUpsert;
+        Update: Partial<ChannelReadCursorUpsert>;
       };
     };
     Enums: {

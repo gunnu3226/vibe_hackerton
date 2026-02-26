@@ -10,9 +10,11 @@ function formatTime(dateStr: string) {
 export default function MessageItem({
   message,
   isOwn,
+  unreadCount,
 }: {
   message: Message;
   isOwn: boolean;
+  unreadCount: number;
 }) {
   const profile = message.profiles;
 
@@ -40,31 +42,38 @@ export default function MessageItem({
             {profile?.display_name ?? "Unknown"}
           </p>
         )}
-        <div
-          className={`rounded-2xl px-4 py-2 ${
-            isOwn
-              ? "bg-indigo-600 text-white"
-              : "bg-white text-gray-900 shadow-sm"
-          }`}
-        >
-          {message.image_url && (
-            <a
-              href={message.image_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={message.image_url}
-                alt="첨부 이미지"
-                className={`max-w-full rounded-lg ${message.content ? "mb-2" : ""}`}
-                style={{ maxHeight: "300px" }}
-              />
-            </a>
-          )}
-          {message.content && (
-            <p className="whitespace-pre-wrap break-words text-sm">
-              {message.content}
-            </p>
+        <div className={`flex items-end gap-1 ${isOwn ? "flex-row-reverse" : ""}`}>
+          <div
+            className={`rounded-2xl px-4 py-2 ${
+              isOwn
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-900 shadow-sm"
+            }`}
+          >
+            {message.image_url && (
+              <a
+                href={message.image_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={message.image_url}
+                  alt="첨부 이미지"
+                  className={`max-w-full rounded-lg ${message.content ? "mb-2" : ""}`}
+                  style={{ maxHeight: "300px" }}
+                />
+              </a>
+            )}
+            {message.content && (
+              <p className="whitespace-pre-wrap break-words text-sm">
+                {message.content}
+              </p>
+            )}
+          </div>
+          {unreadCount > 0 && (
+            <span className="flex-shrink-0 text-xs font-medium text-indigo-500">
+              {unreadCount}
+            </span>
           )}
         </div>
         <p

@@ -126,7 +126,38 @@ CREATE POLICY "Team members can submit results"
     AND team_id IN (SELECT team_id FROM public.profiles WHERE id = auth.uid())
   );
 
--- 10. Realtime 활성화
+-- 10. channel_read_cursors 테이블 (읽음 커서)
+CREATE TABLE public.channel_read_cursors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  channel_id TEXT NOT NULL,  -- 'global' 또는 'team:{uuid}'
+  last_read_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, channel_id)
+);
+
+CREATE INDEX idx_read_cursors_channel ON public.channel_read_cursors(channel_id);
+CREATE INDEX idx_read_cursors_user_channel ON public.channel_read_cursors(user_id, channel_id);
+
+ALTER TABLE public.channel_read_cursors ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Read cursors are viewable by authenticated users"
+  ON public.channel_read_cursors FOR SELECT
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Users can insert own read cursor"
+  ON public.channel_read_cursors FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own read cursor"
+  ON public.channel_read_cursors FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE public.channel_read_cursors;
+
+-- 11. Realtime 활성화
 -- Supabase Dashboard > Database > Replication에서 아래 테이블을 활성화하세요:
 -- - messages
 -- - teams

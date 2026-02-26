@@ -1,6 +1,7 @@
 "use client";
 
 import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
+import { useReadCursors } from "@/hooks/useReadCursors";
 import { useUser } from "@/hooks/useUser";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
@@ -20,6 +21,11 @@ export default function ChatRoom({
     teamId,
   });
   const { user } = useUser();
+  const { getUnreadCount, updateCursor } = useReadCursors({
+    channelType,
+    teamId,
+    currentUserId: user?.id,
+  });
 
   if (loading) {
     return (
@@ -37,6 +43,8 @@ export default function ChatRoom({
       <MessageList
         messages={messages}
         currentUserId={user?.id}
+        getUnreadCount={getUnreadCount}
+        updateCursor={updateCursor}
       />
       <MessageInput onSend={sendMessage} />
     </div>

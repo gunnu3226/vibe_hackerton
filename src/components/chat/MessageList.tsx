@@ -7,15 +7,23 @@ import MessageItem from "./MessageItem";
 export default function MessageList({
   messages,
   currentUserId,
+  getUnreadCount,
+  updateCursor,
 }: {
   messages: Message[];
   currentUserId: string | undefined;
+  getUnreadCount: (messageCreatedAt: string) => number;
+  updateCursor: () => Promise<void>;
 }) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    updateCursor();
+  }, [messages, updateCursor]);
 
   if (messages.length === 0) {
     return (
@@ -32,6 +40,7 @@ export default function MessageList({
           key={message.id}
           message={message}
           isOwn={message.user_id === currentUserId}
+          unreadCount={getUnreadCount(message.created_at)}
         />
       ))}
       <div ref={bottomRef} />
