@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSupabase } from "@/providers/SupabaseProvider";
+import { useSession } from "@/providers/SupabaseProvider";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const supabase = useSupabase();
+  const { session, loading } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    if (!loading) {
       router.replace(session ? "/chat" : "/login");
-    });
-  }, [supabase, router]);
+    }
+  }, [session, loading, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

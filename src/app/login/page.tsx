@@ -1,21 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSupabase } from "@/providers/SupabaseProvider";
+import { useSupabase, useSession } from "@/providers/SupabaseProvider";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const supabase = useSupabase();
+  const { session, loading } = useSession();
   const router = useRouter();
 
-  // 이미 로그인된 유저는 채팅으로 보냄
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        router.replace("/chat");
-      }
-    });
-  }, [supabase, router]);
+    if (!loading && session) {
+      router.replace("/chat");
+    }
+  }, [session, loading, router]);
 
   const handleSlackLogin = async () => {
     await supabase.auth.signInWithOAuth({
