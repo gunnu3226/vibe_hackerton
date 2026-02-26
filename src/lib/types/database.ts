@@ -68,6 +68,32 @@ export interface ResultInsert {
   submitted_by: string;
 }
 
+export interface Review {
+  id: string;
+  team_id: string;
+  project_intro: string;
+  ai_tools_used: string;
+  ai_strengths: string;
+  ai_weaknesses: string;
+  insights: string;
+  deploy_url: string | null;
+  submitted_by: string;
+  created_at: string;
+  profiles?: Profile;
+  teams?: Team;
+}
+
+export interface ReviewInsert {
+  team_id: string;
+  project_intro: string;
+  ai_tools_used: string;
+  ai_strengths: string;
+  ai_weaknesses: string;
+  insights: string;
+  deploy_url?: string | null;
+  submitted_by: string;
+}
+
 export interface ChannelReadCursor {
   id: string;
   user_id: string;
@@ -103,6 +129,11 @@ export interface Database {
         Row: Result;
         Insert: ResultInsert;
         Update: Partial<ResultInsert>;
+      };
+      reviews: {
+        Row: Review;
+        Insert: ReviewInsert;
+        Update: Partial<ReviewInsert>;
       };
       channel_read_cursors: {
         Row: ChannelReadCursor;

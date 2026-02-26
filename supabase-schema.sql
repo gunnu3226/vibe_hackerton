@@ -49,17 +49,33 @@ CREATE TABLE public.results (
   created_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
+-- 6-2. reviews 테이블
+CREATE TABLE public.reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  team_id UUID NOT NULL REFERENCES public.teams ON DELETE CASCADE,
+  project_intro TEXT NOT NULL,
+  ai_tools_used TEXT NOT NULL,
+  ai_strengths TEXT NOT NULL,
+  ai_weaknesses TEXT NOT NULL,
+  insights TEXT NOT NULL,
+  deploy_url TEXT,
+  submitted_by UUID NOT NULL REFERENCES public.profiles(id),
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
 -- 7. 인덱스
 CREATE INDEX idx_messages_channel ON public.messages(channel_type, team_id);
 CREATE INDEX idx_messages_created ON public.messages(created_at);
 CREATE INDEX idx_profiles_team ON public.profiles(team_id);
 CREATE INDEX idx_results_team ON public.results(team_id);
+CREATE INDEX idx_reviews_team ON public.reviews(team_id);
 
 -- 8. RLS 활성화
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.teams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
 -- 9. RLS 정책
 
@@ -126,6 +142,20 @@ CREATE POLICY "Team members can submit results"
     AND team_id IN (SELECT team_id FROM public.profiles WHERE id = auth.uid())
   );
 
+-- reviews: 모든 인증된 사용자가 조회 가능, 팀원만 제출 가능
+CREATE POLICY "Reviews are viewable by authenticated users"
+  ON public.reviews FOR SELECT
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Team members can submit reviews"
+  ON public.reviews FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() = submitted_by
+    AND team_id IN (SELECT team_id FROM public.profiles WHERE id = auth.uid())
+  );
+
 -- 10. channel_read_cursors 테이블 (읽음 커서)
 CREATE TABLE public.channel_read_cursors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -168,3 +198,4 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.teams;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.results;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;

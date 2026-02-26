@@ -8,6 +8,7 @@ const navItems = [
   { href: "/teams", label: "팀 결성", icon: "👥" },
   { href: "/team-chat", label: "팀 채팅", icon: "🗨️" },
   { href: "/results", label: "결과물", icon: "🏆" },
+  { href: "/reviews", label: "후기", icon: "📝" },
 ];
 
 export default function Sidebar({
